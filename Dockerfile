@@ -8,24 +8,25 @@ RUN dotnet restore "./MottuProjeto.csproj"
 
 # Copia todo o código e publica
 COPY . .
-RUN dotnet publish "./MottuProjeto.csproj" -c Release -o /app/publish
+RUN dotnet publish "./MottuProjeto.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Stage 2 - runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-# Cria usuário não-root e garante permissões
-RUN adduser --disabled-password --gecos "" appuser \
-    && chown -R appuser:appuser /app
-
-# Copia os arquivos publicados
+# Copia os arquivos publicados ANTES de criar o usuário
 COPY --from=build /app/publish .
+
+# Cria usuário não-root e ajusta permissões DEPOIS de copiar
+RUN adduser --disabled-password --gecos "" appuser \
+    && chown -R appuser:appuser /app \
+    && chmod -R 755 /app
 
 # Use usuário não-root
 USER appuser
 
-# Variável para Kestrel
-ENV ASPNETCORE_URLS=http://+:80
-EXPOSE 80
+# Configura para usar porta 8080 (usuários não-root não podem usar porta 80)
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "MottuProjeto.dll"]
