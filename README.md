@@ -48,37 +48,39 @@ cd SPRINT1-DOTNET-MAIN
 
 ### 2️⃣ Configuração do Banco de Dados
 Criar Banco de Dados na Azure (exemplo com Azure SQL):
+
 ## Login no Azure
 az login
 
 ## Criar grupo de recursos
-az group create --name rg-mottu-projeto --location eastus
+az group create --name rg-mottu-DevOps --location eastus2
 
 ## Criar SQL Server
 az sql server create \
   --name sql-mottu-server \
   --resource-group rg-mottu-projeto \
-  --location eastus \
+  --location eastus2 \
   --admin-user adminmottu \
-  --admin-password SuaSenhaSegura123!
+  --admin-password 'crie sua senha aqui'
 
 ## Criar banco de dados
 az sql db create \
-  --resource-group rg-mottu-projeto \
+  --resource-group rg-mottu-DevOps \
   --server sql-mottu-server \
   --name db-mottu \
   --service-objective Basic
 
 ## Configurar firewall para permitir acesso do Azure
 az sql server firewall-rule create \
-  --resource-group rg-mottu-projeto \
+  --resource-group rg-mottu-DevOps \
   --server sql-mottu-server \
   --name AllowAzureServices \
   --start-ip-address 0.0.0.0 \
   --end-ip-address 0.0.0.0
 
-  ## Conectar ao banco e executar script_bd.sql
-  Você pode usar Azure Data Studio, SQL Server Management Studio ou Azure Portal
+  ## Conectar ao banco e executar script_bd.sql (Pelo portal do Azure)
+ - Habilite a opção para dar Adm, e acessar o painel para adicionar o script
+ - Acesse o banco de dados
 
   ### 3️⃣ Configurar String de Conexão
 Edite o arquivo appsettings.json com sua connection string:
@@ -101,14 +103,28 @@ docker run -p 8080:8080 mottu-projeto:v1
 ### 5️⃣ Criar Azure Container Registry (ACR)
 
 ## Criar ACR
+```bash
+## Dar permissão:
+az provider register --namespace Microsoft.ContainerRegistry
+
+## Criar ACR:
 az acr create \
-  --resource-group rg-mottu-projeto \
+  --resource-group rg-mottu-DevOps \
   --name acrmottuprojeto \
   --sku Basic \
   --location eastus
 
+## Caso necessário, habilitar manualmente o admin:
+az acr update --name acrmottuprojeto --admin-enabled true
+
+## Validar informações da conta:
+az acr credential show --name acrmottuprojeto
+
 ## Fazer login no ACR
 az acr login --name acrmottuprojeto
+ou
+docker login acrmottuprojeto.azurecr.io -u <username> -p <password>
+````
 
 ### 6️⃣ Push da Imagem para ACR
 
@@ -121,7 +137,7 @@ docker push acrmottuprojeto.azurecr.io/mottu-projeto:v1
 ## Verificar imagem no ACR
 az acr repository list --name acrmottuprojeto --output table
 
-### 7️⃣ Habilitar Admin no ACR
+### 7️⃣ Habilitar Admin no ACR (Se já não habilitou antes)
 ## Habilitar usuário admin no ACR
 az acr update --name acrmottuprojeto --admin-enabled true
 
@@ -129,21 +145,34 @@ az acr update --name acrmottuprojeto --admin-enabled true
 az acr credential show --name acrmottuprojeto
 
 ### 8️⃣ Deploy no Azure Container Instance (ACI)
+```` bash
+## Caso for preciso registrar o namespace:
+az provider register --namespace Microsoft.ContainerInstance
 
-## Criar container instance
+## validar namespace:
+az provider show --namespace Microsoft.ContainerInstance --query "registrationState"
+
+## Criar container instance: (Substitua SUA_SENHA_SQL pela senha real do seu SQL Server)
+
 az container create \
-  --resource-group rg-mottu-projeto \
+  --resource-group rg-mottu-DevOps \
   --name aci-mottu-projeto \
-  --image acrmottuprojeto.azurecr.io/mottu-projeto:v1 \
+  --image acrmottuprojeto.azurecr.io/mottu-projeto:v3 \
   --cpu 1 \
   --memory 1.5 \
+  --os-type Linux \
   --registry-login-server acrmottuprojeto.azurecr.io \
   --registry-username acrmottuprojeto \
   --registry-password $(az acr credential show --name acrmottuprojeto --query "passwords[0].value" -o tsv) \
   --dns-name-label mottu-projeto-app \
   --ports 8080 \
+  --restart-policy OnFailure \
   --environment-variables \
-    ConnectionStrings__DefaultConnection="Server=tcp:sql-mottu-server.database.windows.net,1433;Database=db-mottu;User ID=adminmottu;Password=SuaSenhaSegura123!;Encrypt=True;"
+    "ASPNETCORE_ENVIRONMENT=Production" \
+    "ConnectionStrings__DefaultConnection=Server=tcp:sql-mottu-server.database.windows.net,1433;Database=db-mottu;User ID=adminmottu;Password=Silksong26;Encrypt=True;TrustServerCertificate=True;"
+
+
+````
 
   ### 9️⃣ Verificar Deploy
   ## Verificar status do container
@@ -155,7 +184,7 @@ az container show \
 
 ## Obter logs
 az container logs \
-  --resource-group rg-mottu-projeto \
+  --resource-group rg-mottu-DevOps \
   --name aci-mottu-projeto
 
   ### 🔟 Acessar a Aplicação
