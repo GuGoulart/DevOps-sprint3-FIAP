@@ -54,7 +54,7 @@ O arquivo `script/script_bd.sql` contém o DDL completo das tabelas com:
 ### 1️⃣ Clone do Repositório
 ```bash
 git clone https://github.com/GuGoulart/DevOps-sprint3-FIAP.git
-cd SPRINT1-DOTNET-MAIN
+cd DevOps-sprint3-FIAP
 ```
 
 ### 2️⃣ Configuração do Banco de Dados
@@ -70,19 +70,10 @@ az group create --name rg-mottu-DevOps --location eastus2
 az sql server create --name sql-mottu-server --resource-group rg-mottu-DevOps --location eastus2 --admin-user adminmottu --admin-password MinhaSenhaFort3!
 
 ## Criar banco de dados
-az sql db create \
-  --resource-group rg-mottu-DevOps \
-  --server sql-mottu-server \
-  --name db-mottu \
-  --service-objective Basic
+az sql db create --resource-group rg-mottu-DevOps --server sql-mottu-server --name db-mottu --service-objective Basic
 
 ## Configurar firewall para permitir acesso do Azure
-az sql server firewall-rule create \
-  --resource-group rg-mottu-DevOps \
-  --server sql-mottu-server \
-  --name AllowAzureServices \
-  --start-ip-address 0.0.0.0 \
-  --end-ip-address 0.0.0.0
+az sql server firewall-rule create --resource-group rg-mottu-DevOps --server sql-mottu-server --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
 
   ## Conectar ao banco e executar script_bd.sql (Pelo portal do Azure)
  - Habilite a opção para dar Adm, e acessar o painel para adicionar o script
