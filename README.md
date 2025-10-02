@@ -6,6 +6,17 @@
 
 Sistema de gerenciamento de motocicletas e usuários desenvolvido em .NET 8.0, implementando uma API REST completa com operações CRUD. A aplicação permite o cadastro, consulta, atualização e exclusão de motocicletas, áreas e usuários, com autenticação e implementação de HATEOAS para navegação dinâmica da API.
 
+### Benefícios para o Negócio
+Problemas Resolvidos:
+
+- Centralização de Dados: Eliminação de planilhas descentralizadas para gestão de frota
+- Rastreabilidade: Histórico completo de operações realizadas no sistema
+- Escalabilidade: Arquitetura cloud-native permite crescimento sob demanda
+- Disponibilidade: Infraestrutura em nuvem garante acesso 24/7
+- Redução de Custos: Eliminação de infraestrutura on-premise
+- Segurança: Autenticação e autorização integradas
+- Integração: API REST permite fácil integração com outros sistemas
+
 ### Fluxo de Deploy:
 1. **Build da Aplicação**: Compilação do código .NET
 2. **Criação da Imagem Docker**: Build do Dockerfile
@@ -42,7 +53,7 @@ O arquivo `script/script_bd.sql` contém o DDL completo das tabelas com:
 
 ### 1️⃣ Clone do Repositório
 ```bash
-git clone https://github.com/SEU_USUARIO/SPRINT1-DOTNET-MAIN.git
+git clone https://github.com/GuGoulart/DevOps-sprint3-FIAP.git
 cd SPRINT1-DOTNET-MAIN
 ```
 
