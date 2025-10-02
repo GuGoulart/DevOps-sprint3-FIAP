@@ -67,7 +67,7 @@ az login
 az group create --name rg-mottu-DevOps --location eastus2
 
 ## Criar SQL Server
-az sql server create --name sql-mottu-server --resource-group rg-mottu-projeto --location eastus2 --admin-user adminmottu --admin-password MinhaSenhaFort3!
+az sql server create --name sql-mottu-server --resource-group rg-mottu-DevOps --location eastus2 --admin-user adminmottu --admin-password MinhaSenhaFort3!
 
 ## Criar banco de dados
 az sql db create \
